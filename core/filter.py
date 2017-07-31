@@ -2,7 +2,6 @@ import numpy as np
 
 from cv.smooth import blur
 
-import pdb
 
 class GuidedFilter:
     """
