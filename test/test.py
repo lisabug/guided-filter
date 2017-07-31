@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import unittest
 
-from cv.utils import blur2D
+from cv.smooth import blur
 
 
 class TestBlurMethods(unittest.TestCase):
@@ -13,8 +13,8 @@ class TestBlurMethods(unittest.TestCase):
         # TODO
         I = np.array(range(1, 50)).reshape(7, 7).astype(np.float32)
         r = 1
-        ret1 = blur2D(I, r)
-        ret2 = cv2.blur(I, (3,3))
+        ret1 = blur(I, r)
+        ret2 = cv2.blur(I, (3,3), borderType=cv2.BORDER_DEFAULT)
         print I
         print ret1
         print ret2
