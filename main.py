@@ -1,27 +1,48 @@
 import cv2
 import numpy as np
+import itertools
 
 from core.filter import GuidedFilter
 from tools import visualize as vis
+from cv.image import to_8U, to_32F
 
 
-image = cv2.imread('data/cat.png')
+
+def test_gray():
+    image = cv2.imread('data/cat.png')
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+    radius = [2, 4, 8]
+    eps = [0.1**2, 0.2**2, 0.4**2]
+
+    combs = list(itertools.product(radius, eps))
+
+    vis.plot_single(image, title='origin')
+    for r, e in combs:
+        GF = GuidedFilter(image, radius=r, eps=e)
+        vis.plot_single(GF.filter(image), title='r=%d, eps=%.2f' % (r, e))
 
 
-image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB).astype(np.float32)
-# image = image.astype(np.float32)
+def test_color():
+    image = cv2.imread('data/Lenna.png')
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-# add noise
-noise = (np.random.rand(image.shape[0], image.shape[1], 3) - 0.5) * 0
-image_noise = image + noise
+    noise = (np.random.rand(image.shape[0], image.shape[1], 3) - 0.5) * 50
+    image_noise = image + noise
 
-image_noise = cv2.cvtColor(image_noise.astype(np.uint8), cv2.COLOR_BGR2GRAY).astype(np.float32)
+    radius = [1, 2, 4]
+    eps = [0.005]
 
-GF = GuidedFilter(image, radius=8, eps=0.16)
+    combs = list(itertools.product(radius, eps))
 
-output = GF.filter(image_noise)
+    vis.plot_single(to_32F(image), title='origin')
+    vis.plot_single(to_32F(image_noise), title='noise')
 
-# error = output - image_noise
+    for r, e in combs:
+        GF = GuidedFilter(image, radius=r, eps=e)
+        vis.plot_single(to_32F(GF.filter(image_noise)), title='r=%d, eps=%.3f' % (r, e))
 
-vis.plot_multiple([image, image_noise, output],
-                 ['image', 'input', 'output'],)
+
+if __name__ == '__main__':
+    test_gray()
+    test_color()
