@@ -147,6 +147,7 @@ class MultiDimGuidedFilter:
         corrI_ = corrI_.reshape((self.rows, self.cols, self.chs*self.chs)) # (H, W, CC)
         corrI_ = box_filter(I=corrI_, r=self.radius)
         corrI = corrI_.reshape((self.rows*self.cols, self.chs, self.chs)) # (HW, C, C)
+        corrI = corrI - np.matmul(meanI_, meanI_.transpose(0, 2, 1))
 
         U = np.expand_dims(np.eye(self.chs, dtype=np.float32), axis=0)
         # U = np.tile(U, (self.rows*self.cols, 1, 1)) # (HW, C, C)
